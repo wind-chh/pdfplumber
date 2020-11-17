@@ -6,46 +6,39 @@ import re
 
 lt_pat = re.compile(r"^LT")
 
-DECIMAL_ATTRS = set(
-    [
-        "adv",
-        "height",
-        "linewidth",
-        "pts",
-        "size",
-        "srcsize",
-        "width",
-        "x0",
-        "x1",
-        "y0",
-        "y1",
-    ]
-)
+DECIMAL_ATTRS = {
+    "adv",
+    "height",
+    "linewidth",
+    "pts",
+    "size",
+    "srcsize",
+    "width",
+    "x0",
+    "x1",
+    "y0",
+    "y1"
+}
 
-ADD_ATTRS = set([
-    "render",
-    "matrix"
-])
+ADD_ATTRS = {"render", "matrix"}
 
-ALL_ATTRS = ADD_ATTRS | DECIMAL_ATTRS | set(
-    [
-        "bits",
-        "upright",
-        "font",
-        "fontname",
-        "name",
-        "text",
-        "imagemask",
-        "colorspace",
-        "evenodd",
-        "fill",
-        "non_stroking_color",
-        "path",
-        "stream",
-        "stroke",
-        "stroking_color",
-    ]
-)
+ALL_ATTRS = ADD_ATTRS | DECIMAL_ATTRS | {
+    "bits",
+    "upright",
+    "font",
+    "fontname",
+    "name",
+    "text",
+    "imagemask",
+    "colorspace",
+    "evenodd",
+    "fill",
+    "non_stroking_color",
+    "path",
+    "stream",
+    "stroke",
+    "stroking_color"
+}
 
 
 class Page(Container):
