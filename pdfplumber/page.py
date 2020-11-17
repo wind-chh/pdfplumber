@@ -22,7 +22,12 @@ DECIMAL_ATTRS = set(
     ]
 )
 
-ALL_ATTRS = DECIMAL_ATTRS | set(
+ADD_ATTRS = set([
+    "render",
+    "matrix"
+])
+
+ALL_ATTRS = ADD_ATTRS | DECIMAL_ATTRS | set(
     [
         "bits",
         "upright",
