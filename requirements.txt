@@ -1,3 +1,4 @@
-pdfminer.six==20200517
+# pdfminer.six==20200517
+pdfminer.six==20201018-bestsign
 Pillow>=7.0.0
 Wand
