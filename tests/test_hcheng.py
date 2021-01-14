@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.insert(0, "/home/huan_cheng/workspace/algrithm/pdfplumber")
-print(sys.path)
-
 import pdfplumber
 import pandas as pd
 
 
 # pdf_file = '/home/huan_cheng/workspace/test/pdf2txt/A1.pdf'
-pdf_file = '/Users/wind/tmp/A1.pdf'
+pdf_file = '/home/huan_cheng/Documents/pdf_files/A1.pdf'
 # pdf_file = '/home/huan_cheng/workspace/test/pdf2txt/bold_font_test.pdf'
 
 pdf = pdfplumber.open(pdf_file)
 for page in pdf.pages:
-    print(page.extract_text())
+    # print(page.extract_text())
+    tables = page.extract_tables()
+    print(tables)
 # page2 = pdf.pages[2]
 
 # for c in page1.chars:
