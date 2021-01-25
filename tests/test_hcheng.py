@@ -1,19 +1,26 @@
 #!/usr/bin/env python3
 
+from os import set_blocking
 import pdfplumber
-import pandas as pd
+# import pandas as pd
 
-
-# pdf_file = '/home/huan_cheng/workspace/test/pdf2txt/A1.pdf'
-pdf_file = '/home/huan_cheng/Documents/pdf_files/A1.pdf'
+# pdf_file = '/home/huan_cheng/Documents/pdf_files/A1.pdf'
+# pdf_file = '/home/huan_cheng/Documents/pdf_files/B1.pdf'
 # pdf_file = '/home/huan_cheng/workspace/test/pdf2txt/bold_font_test.pdf'
+# pdf_file = '/home/huan_cheng/Documents/pdf_files/table_edge_debug.pdf'
+pdf_file = '/home/huan_cheng/workspace/algrithm/pdfplumber/tests/pdfs/issue-13-151201DSP-Fond-581-90D.pdf'
 
 pdf = pdfplumber.open(pdf_file)
-for page in pdf.pages:
-    # print(page.extract_text())
-    tables = page.extract_tables()
-    print(tables)
-# page2 = pdf.pages[2]
+# for pnum, page in enumerate(pdf.pages):
+#     # print(page.extract_text())
+#     tables = page.extract_tables()
+#     print(f"Page: {pnum}, Tables: {len(tables)}")
+
+p1 = pdf.pages[0]
+tables = p1.extract_tables()
+# print(tables)
+# print(len(p1.objects['curve']))
+
 
 # for c in page1.chars:
 #     print(c['render'], type(c['render']))

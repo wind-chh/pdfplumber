@@ -609,3 +609,12 @@ def filter_edges(edges, orientation=None, edge_type=None, min_length=1):
 
     edges = filter(test, edges)
     return list(edges)
+
+
+def filter_visible_rects(rects):
+    pass
+
+
+def filter_visible_lines(lines):
+    pass
+
