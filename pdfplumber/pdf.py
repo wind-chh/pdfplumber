@@ -1,7 +1,8 @@
 from .container import Container
 from .page import Page
-from .utils import decode_text
+from .utils import resolve_and_decode
 
+import logging
 import pathlib
 import itertools
 from pdfminer.pdfparser import PDFParser
@@ -10,13 +11,22 @@ from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.layout import LAParams
 from pdfminer.converter import PDFPageAggregator
-from pdfminer.psparser import PSLiteral
+
+logger = logging.getLogger(__name__)
 
 
 class PDF(Container):
     cached_properties = Container.cached_properties + ["_pages"]
 
-    def __init__(self, stream, pages=None, laparams=None, precision=0.001, password=""):
+    def __init__(
+        self,
+        stream,
+        pages=None,
+        laparams=None,
+        precision=0.001,
+        password="",
+        strict_metadata=False,
+    ):
         self.laparams = None if laparams is None else LAParams(**laparams)
         self.stream = stream
         self.pages_to_parse = pages
@@ -27,23 +37,28 @@ class PDF(Container):
         for info in self.doc.info:
             self.metadata.update(info)
         for k, v in self.metadata.items():
-            if hasattr(v, "resolve"):
-                v = v.resolve()
-            if type(v) == list:
-                self.metadata[k] = list(map(decode_text, v))
-            elif isinstance(v, PSLiteral):
-                self.metadata[k] = decode_text(v.name)
-            elif isinstance(v, bool):
-                self.metadata[k] = v
-            else:
-                self.metadata[k] = decode_text(v)
+            try:
+                self.metadata[k] = resolve_and_decode(v)
+            except Exception as e:
+                if strict_metadata:
+                    # Raise an exception since unable to resolve the metadata value.
+                    raise
+                # This metadata value could not be parsed. Instead of failing the PDF
+                # read, treat it as a warning only if `strict_metadata=False`.
+                logger.warning(
+                    f'[WARNING] Metadata key "{k}" could not be parsed due to '
+                    f"exception: {str(e)}"
+                )
         self.device = PDFPageAggregator(rsrcmgr, laparams=self.laparams)
         self.interpreter = PDFPageInterpreter(rsrcmgr, self.device)
 
     @classmethod
     def open(cls, path_or_fp, **kwargs):
         if isinstance(path_or_fp, (str, pathlib.Path)):
-            return cls(open(path_or_fp, "rb"), **kwargs)
+            fp = open(path_or_fp, "rb")
+            inst = cls(fp, **kwargs)
+            inst.close = fp.close
+            return inst
         else:
             return cls(path_or_fp, **kwargs)
 
@@ -69,7 +84,10 @@ class PDF(Container):
         return self._pages
 
     def close(self):
-        self.stream.close()
+        """
+        Override this method to execute code on __exit__.
+        """
+        pass
 
     def __enter__(self):
         return self
