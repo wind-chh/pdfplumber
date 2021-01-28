@@ -629,10 +629,30 @@ def filter_edges(edges, orientation=None, edge_type=None, min_length=1):
     return list(edges)
 
 
-def filter_visible_rects(rects):
-    pass
+def is_white_color(color):
+    if color is None:
+        return False
+    color = decimalize(color)
+    if color == Decimal(1.0):
+        return True
+    elif color == (1, 1, 1):
+        return True
+    elif color == (0, 0, 0, 0):
+        return True
+    else:
+        return False
 
 
-def filter_visible_lines(lines):
-    pass
-
+def is_visible(obj):
+    stroke_white = False
+    fill_white = False
+    if (not obj['stroke']) or is_white_color(obj['stroking_color']):
+        stroke_white = True
+    
+    if (not obj['fill']) or is_white_color(obj['non_stroking_color']):
+        fill_white = True
+    
+    if stroke_white and fill_white:
+        return False
+    else:
+        return True

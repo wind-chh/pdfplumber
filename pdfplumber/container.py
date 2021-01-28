@@ -35,7 +35,8 @@ class Container(object):
     def rect_edges(self):
         if hasattr(self, "_rect_edges"):
             return self._rect_edges
-        rect_edges_gen = (utils.rect_to_edges(r) for r in self.rects)
+        visible_rects = filter(utils.is_visible, self.rects)
+        rect_edges_gen = (utils.rect_to_edges(r) for r in visible_rects)
         self._rect_edges = list(chain(*rect_edges_gen))
         return self._rect_edges
 
@@ -43,7 +44,8 @@ class Container(object):
     def edges(self):
         if hasattr(self, "_edges"):
             return self._edges
-        line_edges = list(map(utils.line_to_edge, self.lines))
+        visible_lines = filter(utils.is_visible, self.lines)
+        line_edges = list(map(utils.line_to_edge, visible_lines))
         self._edges = self.rect_edges + line_edges
         return self._edges
 
