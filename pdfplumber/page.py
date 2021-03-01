@@ -2,6 +2,8 @@ from . import utils
 from .utils import resolve_all
 from .table import TableFinder
 from .container import Container
+from pdfminer.pdfinterp import PDFPageInterpreter
+from pdfminer.converter import PDFPageAggregator
 import re
 
 lt_pat = re.compile(r"^LT")
@@ -97,7 +99,14 @@ class Page(Container):
     def layout(self):
         if hasattr(self, "_layout"):
             return self._layout
-        self._layout = self.pdf.process_page(self.page_obj)
+        device = PDFPageAggregator(
+            self.pdf.rsrcmgr,
+            pageno=self.page_number,
+            laparams=self.pdf.laparams,
+        )
+        interpreter = PDFPageInterpreter(self.pdf.rsrcmgr, device)
+        interpreter.process_page(self.page_obj)
+        self._layout = device.get_result()
         return self._layout
 
     @property
@@ -196,9 +205,12 @@ class Page(Container):
 
     def iter_layout_objects(self, layout_objects):
         for obj in layout_objects:
-            # If object is, like LTFigure, a higher-level object
-            # then iterate through it's children
+            # If object is, like LTFigure, a higher-level object ...
             if hasattr(obj, "_objs"):
+                # and LAParams is passed, process the object itself.
+                if self.pdf.laparams is not None:
+                    yield self.process_object(obj)
+                # Regardless, iterate through its children
                 yield from self.iter_layout_objects(obj._objs)
             else:
                 yield self.process_object(obj)

@@ -2,8 +2,28 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [0.5.27] — 2021-02-28
+### Fixed
+- Fix regression (introduced in `0.5.26`/[b1849f4](https://github.com/jsvine/pdfplumber/commit/b1849f4)) in closing files opened by `PDF.open`
+- Reinstate access to higher-level layout objects (such as `textboxhorizontal`) when `laparams` is passed to `pdfplumber.open(...)`. Had been removed in `0.5.24` via [1f87898](https://github.com/jsvine/pdfplumber/commit/1f878988576017b64f5cd77e1eb21b401124c699). ([#359](https://github.com/jsvine/pdfplumber/issues/359) + [#364](https://github.com/jsvine/pdfplumber/pull/364))
+
+### Development Changes
+- Add a `python setup.py build sdist` test to main GitHub action. ([#365](https://github.com/jsvine/pdfplumber/pull/365))
+
+## [0.5.26] — 2021-02-10
+### Added
+- Add `Page.close/__enter__/__exit__` methods, by generalizing that behavior through the `Container` class ([b1849f4](https://github.com/jsvine/pdfplumber/commit/b1849f4))
+
+### Changed
+- Change `TableFinder` to return tables in order of topmost-and-then-leftmost, rather than leftmost-and-then-topmost ([#336](https://github.com/jsvine/pdfplumber/issues/336))
+- Change `Page.to_image()`'s handling of alpha layer, to remove aliasing artifacts ([#340](https://github.com/jsvine/pdfplumber/pull/340)) [h/t @arlyon]
+
+### Development Changes
+
+- Enforce `psf/black` and `flake8` on `tests/` ([#327](https://github.com/jsvine/pdfplumber/pull/327)
+
 ## [0.5.25] — 2020-12-09
-## Added
+### Added
 - Add new boolean argument `strict_metadata` (default `False`) to `pdfplumber.open(...)` method for handling metadata resolution failures ([f2c510d](https://github.com/jsvine/pdfplumber/commit/f2c510d))
 
 ### Fixed

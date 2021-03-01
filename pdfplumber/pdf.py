@@ -8,9 +8,8 @@ import itertools
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdfpage import PDFPage
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.layout import LAParams
-from pdfminer.converter import PDFPageAggregator
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +30,8 @@ class PDF(Container):
         self.stream = stream
         self.pages_to_parse = pages
         self.precision = precision
-        rsrcmgr = PDFResourceManager()
         self.doc = PDFDocument(PDFParser(stream), password=password)
+        self.rsrcmgr = PDFResourceManager()
         self.metadata = {}
         for info in self.doc.info:
             self.metadata.update(info)
@@ -49,22 +48,16 @@ class PDF(Container):
                     f'[WARNING] Metadata key "{k}" could not be parsed due to '
                     f"exception: {str(e)}"
                 )
-        self.device = PDFPageAggregator(rsrcmgr, laparams=self.laparams)
-        self.interpreter = PDFPageInterpreter(rsrcmgr, self.device)
 
     @classmethod
     def open(cls, path_or_fp, **kwargs):
         if isinstance(path_or_fp, (str, pathlib.Path)):
             fp = open(path_or_fp, "rb")
             inst = cls(fp, **kwargs)
-            inst.close = fp.close
+            inst.close_file = fp.close
             return inst
         else:
             return cls(path_or_fp, **kwargs)
-
-    def process_page(self, page):
-        self.interpreter.process_page(page)
-        return self.device.get_result()
 
     @property
     def pages(self):
@@ -82,19 +75,6 @@ class PDF(Container):
             self._pages.append(p)
             doctop += p.height
         return self._pages
-
-    def close(self):
-        """
-        Override this method to execute code on __exit__.
-        """
-        pass
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type, value, traceback):
-        self.flush_cache()
-        self.close()
 
     @property
     def objects(self):
