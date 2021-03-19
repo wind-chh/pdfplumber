@@ -79,7 +79,8 @@ class Test(unittest.TestCase):
 
     def test_edge_merging(self):
         p0 = self.pdf.pages[0]
-        assert len(p0.edges) == 364
+        # assert len(p0.edges) == 364
+        assert len(p0.edges) == 292  # filter invisible edges
         assert (
             len(table.merge_edges(p0.edges, snap_tolerance=3, join_tolerance=3)) == 46
         )
