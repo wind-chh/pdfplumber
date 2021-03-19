@@ -632,7 +632,10 @@ def filter_edges(edges, orientation=None, edge_type=None, min_length=1):
 def is_white_color(color):
     if color is None:
         return False
-    color = decimalize(color)
+    try:
+        color = decimalize(color)
+    except ValueError:
+        return True  # take color like /'P12' as white
     if color == Decimal(1.0):
         return True
     elif color == (1, 1, 1):
@@ -643,13 +646,14 @@ def is_white_color(color):
         return False
 
 
-def is_visible(obj):
+def is_visible(curve_obj):
+    """Check if a LTRect or LTLine object is visible"""
     stroke_white = False
     fill_white = False
-    if (not obj['stroke']) or is_white_color(obj['stroking_color']):
+    if (not curve_obj['stroke']) or is_white_color(curve_obj['stroking_color']):
         stroke_white = True
     
-    if (not obj['fill']) or is_white_color(obj['non_stroking_color']):
+    if (not curve_obj['fill']) or is_white_color(curve_obj['non_stroking_color']):
         fill_white = True
     
     if stroke_white and fill_white:
