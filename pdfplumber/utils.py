@@ -614,7 +614,7 @@ def obj_to_edges(obj):
     }[obj["object_type"]](obj)
 
 
-def filter_edges(edges, orientation=None, edge_type=None, min_length=1):
+def filter_edges(edges, orientation=None, edge_type=None, min_length=1, page_bbox=None):
 
     if orientation not in ("v", "h", None):
         raise ValueError("Orientation must be 'v' or 'h'")
@@ -623,7 +623,8 @@ def filter_edges(edges, orientation=None, edge_type=None, min_length=1):
         dim = "height" if e["orientation"] == "v" else "width"
         et_correct = e["object_type"] == edge_type if edge_type is not None else True
         orient_correct = orientation is None or e["orientation"] == orientation
-        return et_correct and orient_correct and (e[dim] >= min_length)
+        edge_in_page = (not edge_out_of_bbox(e, page_bbox)) if page_bbox else True
+        return et_correct and orient_correct and edge_in_page and (e[dim] >= min_length)
 
     edges = filter(test, edges)
     return list(edges)
@@ -646,17 +647,54 @@ def is_white_color(color):
         return False
 
 
-def is_visible(curve_obj):
-    """Check if a LTRect or LTLine object is visible"""
+def is_visible_curve(obj):
+    """Check if a curve object(LTCurve, LTRect, LTLine) is visible"""
     stroke_white = False
     fill_white = False
-    if (not curve_obj['stroke']) or is_white_color(curve_obj['stroking_color']):
+    if (not obj['stroke']) or is_white_color(obj['stroking_color']):
         stroke_white = True
     
-    if (not curve_obj['fill']) or is_white_color(curve_obj['non_stroking_color']):
+    if (not obj['fill']) or is_white_color(obj['non_stroking_color']):
         fill_white = True
     
     if stroke_white and fill_white:
         return False
     else:
         return True
+
+
+def edge_out_of_bbox(edge, bbox):
+    if edge['orientation'] == 'v':
+        if edge['x0'] < bbox[0] or edge['x0'] > bbox[2]:
+            return True
+        if edge['bottom'] > bbox[3] or edge['top'] < bbox[1]:
+            return True
+        return False
+    else:
+        if edge['top'] > bbox[3] or edge['top'] < bbox[1]:
+            return True
+        if edge['x0'] > bbox[2] or edge['x1'] < bbox[0]:
+            return True
+        return False
+
+
+def resize_edges(edges, page_bbox):
+    rc = []
+    for e in edges:
+        if e['orientation'] == 'h':
+            if e['x1'] > page_bbox[2]:
+                e = resize_object(e, 'x1', page_bbox[2])
+            if e['x0'] < page_bbox[0]:
+                e = resize_object(e, 'x0', page_bbox[0])
+            rc.append(e)
+        else:
+            if e['top'] > page_bbox[3]:
+                e = resize_object(e, 'top', page_bbox[3])
+            if e['bottom'] < page_bbox[1]:
+                e = resize_object(e, 'bottom', page_bbox[1])
+            rc.append(e)
+    
+    return rc
+
+
+

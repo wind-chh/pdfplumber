@@ -551,4 +551,6 @@ class TableFinder(object):
                 snap_tolerance=settings["snap_tolerance"],
                 join_tolerance=settings["join_tolerance"],
             )
-        return utils.filter_edges(edges, min_length=settings["edge_min_length"])
+        # return utils.filter_edges(edges, min_length=settings["edge_min_length"])
+        r = utils.filter_edges(edges, min_length=settings["edge_min_length"], page_bbox=self.page.bbox)
+        return utils.resize_edges(r, self.page.bbox)
