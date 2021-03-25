@@ -25,7 +25,9 @@ class PDF(Container):
         precision=0.001,
         password="",
         strict_metadata=False,
+        parsed_objects = None
     ):
+        self.parsed_objects = parsed_objects
         self.laparams = None if laparams is None else LAParams(**laparams)
         self.stream = stream
         self.pages_to_parse = pages
@@ -71,7 +73,10 @@ class PDF(Container):
             page_number = i + 1
             if pp is not None and page_number not in pp:
                 continue
-            p = Page(self, page, page_number=page_number, initial_doctop=doctop)
+            if self.parsed_objects:
+                p = Page(self, page, page_number=page_number, initial_doctop=doctop, parsed_objs=self.parsed_objects[i])
+            else:
+                p = Page(self, page, page_number=page_number, initial_doctop=doctop)
             self._pages.append(p)
             doctop += p.height
         return self._pages

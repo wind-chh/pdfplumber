@@ -47,7 +47,9 @@ class Page(Container):
     cached_properties = Container.cached_properties + ["_layout"]
     is_original = True
 
-    def __init__(self, pdf, page_obj, page_number=None, initial_doctop=0):
+    def __init__(self, pdf, page_obj, page_number=None, initial_doctop=0, parsed_objs=None):
+        if parsed_objs:
+            self.parsed_objs = parsed_objs
         self.pdf = pdf
         self.page_obj = page_obj
         self.page_number = page_number
@@ -154,6 +156,8 @@ class Page(Container):
 
     @property
     def objects(self):
+        if hasattr(self, "parsed_objs"):
+            return self.parsed_objs
         if hasattr(self, "_objects"):
             return self._objects
         self._objects = self.parse_objects()
