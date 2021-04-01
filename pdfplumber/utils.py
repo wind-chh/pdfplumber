@@ -191,7 +191,7 @@ def dedupe_chars(chars, tolerance=1):
     Removes duplicate chars — those sharing the same text, fontname, size,
     and positioning (within `tolerance`) as other characters in the set.
     """
-    key = itemgetter("fontname", "size", "upright", "text")
+    key = itemgetter("size", "upright", "text")
     pos_key = itemgetter("doctop", "x0")
     t = decimalize(tolerance)
 
