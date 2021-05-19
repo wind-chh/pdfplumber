@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-import sys
-print(sys.path)
+
 import os
-import pdfplumber
+import time
+import pdfplumber as pp
+import pickle
 # import pandas as pd
 
-# pdf_file = '/home/huan_cheng/Documents/pdf_files/A1.pdf'
+pdf_file = '/home/huan_cheng/Documents/pdf_files/A1.pdf'
 # pdf_file = '/home/huan_cheng/Documents/pdf_files/B1.pdf'
-pdf_file = '/home/huan_cheng/Documents/pdf_files/C1.pdf'
+# pdf_file = '/home/huan_cheng/Documents/pdf_files/C1.pdf'
 # pdf_file = '/home/huan_cheng/Documents/pdf_files/D1.pdf'
 # pdf_file = '/home/huan_cheng/Documents/pdf_files/G1.pdf'
 # pdf_file = '/home/huan_cheng/workspace/algrithm/contractsimilarity/data/pdf/TemplateB.pdf'
@@ -16,8 +17,36 @@ pdf_file = '/home/huan_cheng/Documents/pdf_files/C1.pdf'
 # pdf_file = '/home/huan_cheng/workspace/algrithm/pdfplumber/tests/pdfs/issue-13-151201DSP-Fond-581-90D.pdf'
 # pdf_file = '/home/huan_cheng/Documents/pdf_files/bold_font_test.pdf'
 
-pdf = pdfplumber.open(pdf_file)
-p = pdf.pages[1]
+# pdf_file = '/home/huan_cheng/Downloads/wfirma_Faktura_FV_1_2021.pdf'
+
+st = time.time()
+with pp.open(pdf_file) as pdf:
+    # for index, p in enumerate(pdf.pages):
+    #     for c in p.chars:
+    #         print(f"{c['text']}, {c['fontname']}")
+    #     # print(p.extract_text())
+    p2 = pdf.pages[1]
+    img = p2.to_image()
+    img.save('/tmp/test.png')
+
+et = time.time()
+print(f"Time: {et - st}")
+
+# with open('/tmp/A1.pk', 'wb') as fp:
+#     pickle.dump(page_objs, fp)
+
+##############################################
+# with open('/tmp/A1.pk', 'rb') as fp:
+#     page_objs = pickle.load(fp)
+
+# st = time.time()
+# with pp.open(pdf_file, parsed_objects=page_objs) as pdf:
+#     for page in pdf.pages:
+#         print(page.extract_text())
+# et = time.time()
+# print(f"Time: {et - st}")
+##############################################
+
 # print(len(p.rects))
 # print(len(p.curves))
 # text = p.extract_text()

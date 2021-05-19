@@ -637,11 +637,12 @@ def is_white_color(color):
         color = decimalize(color)
     except ValueError:
         return True  # take color like /'P12' as white
-    if color == Decimal(1.0):
-        return True
-    elif color == (1, 1, 1):
-        return True
-    elif color == (0, 0, 0, 0):
+    if isinstance(color, (list, tuple)):
+        if list(color) in [[1, 1, 1], [0, 0, 0, 0]]:
+            return True
+        else:
+            return False
+    elif color == Decimal(1.0):
         return True
     else:
         return False
@@ -653,10 +654,10 @@ def is_visible_curve(obj):
     fill_white = False
     if (not obj['stroke']) or is_white_color(obj['stroking_color']):
         stroke_white = True
-    
+
     if (not obj['fill']) or is_white_color(obj['non_stroking_color']):
         fill_white = True
-    
+
     if stroke_white and fill_white:
         return False
     else:
@@ -693,8 +694,5 @@ def resize_edges(edges, page_bbox):
             if e['bottom'] < page_bbox[1]:
                 e = resize_object(e, 'bottom', page_bbox[1])
             rc.append(e)
-    
+
     return rc
-
-
-
